@@ -278,7 +278,7 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzUzSTIXhzWrGBiSDvBRYIprWtvJUIPemdvSwXaAAXM0cYUaAMS3O-zmqvKhDdANUyU/exec";
 
 const HIDDEN_COLS  = ["Latitude", "Longitude", "check1", "check2", "location", "Photo"];
-const FILTER_COLS  = ["Salesman", "City", "Category", "Rating", "Visit Days", "Rymax"];
+const FILTER_COLS  = ["Salesman", "City", "category", "rate", "visitDays", "useOil", "hasUFI"];
 const DATE_COLS    = ["Date", "date"];
 
 // ===== Rating Colors — fixed distinct palette per rank =====
@@ -493,7 +493,7 @@ function renderRows(rows) {
 function renderRatingBar(rows) {
   const byRating = {};
   rows.forEach(r => {
-    const key = String(r.Rating ?? "").trim() || "—";
+    const key = String(r.rate ?? "").trim() || "—";
     // Pre-assign color on first encounter to keep consistent
     getRatingColor(key);
     byRating[key] = (byRating[key] || 0) + 1;
@@ -532,7 +532,7 @@ function renderRatingBar(rows) {
 // ===== Filter by Rating =====
 function filterByRating(rating) {
   clearAllFilters(false);
-  const inst = choicesInstances["Rating"];
+  const inst = choicesInstances["rate"];
   if (inst) {
     inst.setChoiceByValue(rating);
     filtersVisible = true;
@@ -629,13 +629,13 @@ function updateMap(rows) {
 
       points.push([lat, lng, 0.8]);
 
-      const color  = getRatingColor(String(r.Rating ?? "").trim() || "—");
+      const color  = getRatingColor(String(r.rate ?? "").trim() || "—");
       const circle = L.circleMarker([lat, lng], {
         radius: 6, fillColor: color,
         color: "#fff", weight: 1.5,
         opacity: 1, fillOpacity: 0.9
       });
-      const label = `${r['Trade Name'] ?? ''} ${r.Rating ? '| ' + r.Rating : ''}`;
+      const label = `${r['Trade Name'] ?? ''} ${r.rate ? '| ' + r.rate : ''}`;
       circle.bindTooltip(label.trim(), { permanent: false, direction: "top" });
       circle.addTo(map);
       markers.push(circle);
