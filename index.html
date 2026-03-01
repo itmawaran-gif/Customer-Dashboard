@@ -348,7 +348,6 @@ function toggleMapLayer() {
 // ===== Dark Mode =====
 function toggleDark() {
   document.body.classList.toggle("dark");
-  // sync header background with dark mode
   document.getElementById("stickyHeader").style.background = "";
 }
 
@@ -494,7 +493,6 @@ function renderRatingBar(rows) {
   const byRating = {};
   rows.forEach(r => {
     const key = String(r.rate ?? "").trim() || "—";
-    // Pre-assign color on first encounter to keep consistent
     getRatingColor(key);
     byRating[key] = (byRating[key] || 0) + 1;
   });
@@ -635,8 +633,33 @@ function updateMap(rows) {
         color: "#fff", weight: 1.5,
         opacity: 1, fillOpacity: 0.9
       });
-      const label = `${r['Trade Name'] ?? ''} ${r.rate ? '| ' + r.rate : ''}`;
-      circle.bindTooltip(label.trim(), { permanent: false, direction: "top" });
+
+      // إظهار اسم المحل مع تفاصيل عند النقر
+      const tradeName  = String(r['tradeName']  ?? '').trim();
+      const ownerName  = String(r['ownerName']  ?? '').trim();
+      const address    = String(r['address']    ?? '').trim();
+      const phone      = String(r['phone']      ?? '').trim();
+      const category   = String(r['category']   ?? '').trim();
+      const rateVal    = String(r['rate']        ?? '').trim();
+
+      const tooltipText = tradeName || ownerName || address || '';
+
+      if (tooltipText) {
+        circle.bindTooltip(tooltipText, { permanent: false, direction: "top" });
+      }
+
+      const popupLines = [];
+      if (tradeName)  popupLines.push(`<strong>🏪 ${tradeName}</strong>`);
+      if (ownerName)  popupLines.push(`👤 ${ownerName}`);
+      if (address)    popupLines.push(`📍 ${address}`);
+      if (phone)      popupLines.push(`📞 ${phone}`);
+      if (category)   popupLines.push(`🗂️ ${category}`);
+      if (rateVal)    popupLines.push(`⭐ ${rateVal}`);
+
+      if (popupLines.length) {
+        circle.bindPopup(popupLines.join('<br>'), { maxWidth: 220 });
+      }
+
       circle.addTo(map);
       markers.push(circle);
     }
